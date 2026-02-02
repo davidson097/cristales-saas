@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from sqlalchemy import Column, String, Boolean, DateTime, Text
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 from ...db.base import Base
 
 
@@ -22,6 +23,10 @@ class Empresa(Base):
     
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    # Relationships
+    almacenes = relationship("Almacen", back_populates="empresa")
+    usuarios = relationship("Usuario", back_populates="empresa")
     
     def __repr__(self):
         return f"<Empresa {self.nombre}>"

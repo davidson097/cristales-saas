@@ -7,11 +7,10 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     
     # Database
-    db_host: str = "localhost"
-    db_port: int = 5432
-    db_user: str = "cristales_admin"
-    db_password: str = "cristales_pass"
-    db_name: str = "cristales_db"
+    postgres_user: str = "cristales"
+    postgres_password: str = "passcristales"
+    postgres_db: str = "cristales_db"
+    database_url: str = "postgresql://cristales:passcristales@localhost:5432/cristales_db"
     
     # Security
     secret_key: str = "your-secret-key-change-in-production"
@@ -25,8 +24,27 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
     
     @property
-    def database_url(self) -> str:
-        return f"postgresql+psycopg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+    def db_host(self) -> str:
+        # Extract host from DATABASE_URL
+        if "localhost" in self.database_url:
+            return "localhost"
+        return "localhost"  # fallback
+    
+    @property
+    def db_port(self) -> int:
+        return 5432  # Extract from DATABASE_URL if needed
+    
+    @property
+    def db_user(self) -> str:
+        return self.postgres_user
+    
+    @property
+    def db_password(self) -> str:
+        return self.postgres_password
+    
+    @property
+    def db_name(self) -> str:
+        return self.postgres_db
     
     @property
     def cors_origins_list(self) -> list:
@@ -35,6 +53,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"  # Allow extra fields from env
 
 
 @lru_cache()
