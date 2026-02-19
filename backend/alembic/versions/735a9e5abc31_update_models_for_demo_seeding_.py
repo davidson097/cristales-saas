@@ -1,8 +1,8 @@
 """Update models for demo seeding compatibility
 
-Revision ID: ee64461f840f
+Revision ID: 735a9e5abc31
 Revises: 864e280094ad
-Create Date: 2026-02-01 22:04:05.286545
+Create Date: 2026-02-02 19:09:38.276463
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'ee64461f840f'
+revision: str = '735a9e5abc31'
 down_revision: Union[str, Sequence[str], None] = '864e280094ad'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -39,32 +39,6 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.drop_index(op.f('uq_usuario_rol_empresa'), table_name='usuario_roles')
-    op.drop_table('usuario_roles')
-    op.drop_table('sesiones')
-    op.drop_table('liquidacion_detalle')
-    op.drop_index(op.f('idx_cristal_tipo'), table_name='cristales')
-    op.drop_index(op.f('uq_cristal_empresa_sku'), table_name='cristales')
-    op.drop_table('cristales')
-    op.drop_index(op.f('idx_compat_marca_modelo'), table_name='compatibilidad')
-    op.drop_table('compatibilidad')
-    op.drop_table('orden_detalle')
-    op.drop_table('reglas_comision')
-    op.drop_table('liquidaciones')
-    op.drop_table('factura_detalle')
-    op.drop_table('auditoria_eventos')
-    op.drop_index(op.f('uq_perfil_laboral_usuario_tipo'), table_name='usuario_perfil_laboral')
-    op.drop_table('usuario_perfil_laboral')
-    op.drop_index(op.f('uq_seq_empresa_tipo_serie'), table_name='secuencias_documentos')
-    op.drop_table('secuencias_documentos')
-    op.drop_index(op.f('uq_tramo_item'), table_name='tramo_items')
-    op.drop_table('tramo_items')
-    op.drop_index(op.f('idx_tramo_ref'), table_name='tramos')
-    op.drop_table('tramos')
-    op.drop_table('permisos')
-    op.drop_table('roturas_cristales')
-    op.drop_index(op.f('uq_rol_permiso_empresa'), table_name='rol_permisos')
-    op.drop_table('rol_permisos')
     op.alter_column('alertas_stock', 'id',
                existing_type=sa.UUID(),
                server_default=None,
@@ -116,54 +90,51 @@ def upgrade() -> None:
     op.add_column('clientes', sa.Column('name', sa.String(), nullable=True))
     op.alter_column('clientes', 'id',
                existing_type=sa.UUID(),
-               type_=sa.Integer(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               server_default=None,
+               existing_nullable=False)
     op.drop_index(op.f('idx_clientes_doc'), table_name='clientes')
     op.drop_index(op.f('idx_clientes_nombre'), table_name='clientes')
     op.drop_index(op.f('idx_clientes_tel'), table_name='clientes')
-    op.drop_constraint(op.f('clientes_empresa_id_fkey'), 'clientes', type_='foreignkey')
     op.drop_constraint(op.f('clientes_zona_id_fkey'), 'clientes', type_='foreignkey')
-    op.drop_column('clientes', 'nombre_comercial')
-    op.drop_column('clientes', 'email_principal')
-    op.drop_column('clientes', 'tipo')
-    op.drop_column('clientes', 'zona_id')
-    op.drop_column('clientes', 'documento_numero')
+    op.drop_constraint(op.f('clientes_empresa_id_fkey'), 'clientes', type_='foreignkey')
     op.drop_column('clientes', 'creado_en')
-    op.drop_column('clientes', 'documento_tipo')
     op.drop_column('clientes', 'activo')
-    op.drop_column('clientes', 'empresa_id')
-    op.drop_column('clientes', 'direccion')
+    op.drop_column('clientes', 'documento_numero')
+    op.drop_column('clientes', 'nombre_comercial')
     op.drop_column('clientes', 'telefono_principal')
+    op.drop_column('clientes', 'zona_id')
+    op.drop_column('clientes', 'direccion')
+    op.drop_column('clientes', 'empresa_id')
+    op.drop_column('clientes', 'tipo')
+    op.drop_column('clientes', 'documento_tipo')
+    op.drop_column('clientes', 'email_principal')
     op.add_column('comisiones', sa.Column('amount', sa.Integer(), nullable=True))
     op.alter_column('comisiones', 'id',
                existing_type=sa.UUID(),
-               type_=sa.Integer(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
-    op.drop_constraint(op.f('comisiones_factura_detalle_id_fkey'), 'comisiones', type_='foreignkey')
-    op.drop_constraint(op.f('comisiones_regla_id_fkey'), 'comisiones', type_='foreignkey')
-    op.drop_constraint(op.f('comisiones_perfil_laboral_id_fkey'), 'comisiones', type_='foreignkey')
-    op.drop_constraint(op.f('comisiones_factura_id_fkey'), 'comisiones', type_='foreignkey')
-    op.drop_constraint(op.f('comisiones_creado_por_fkey'), 'comisiones', type_='foreignkey')
+               server_default=None,
+               existing_nullable=False)
     op.drop_constraint(op.f('comisiones_empresa_id_fkey'), 'comisiones', type_='foreignkey')
-    op.drop_column('comisiones', 'tipo')
-    op.drop_column('comisiones', 'valor_aplicado')
+    op.drop_constraint(op.f('comisiones_perfil_laboral_id_fkey'), 'comisiones', type_='foreignkey')
+    op.drop_constraint(op.f('comisiones_factura_detalle_id_fkey'), 'comisiones', type_='foreignkey')
+    op.drop_constraint(op.f('comisiones_creado_por_fkey'), 'comisiones', type_='foreignkey')
+    op.drop_constraint(op.f('comisiones_factura_id_fkey'), 'comisiones', type_='foreignkey')
+    op.drop_constraint(op.f('comisiones_regla_id_fkey'), 'comisiones', type_='foreignkey')
+    op.drop_column('comisiones', 'creado_en')
+    op.drop_column('comisiones', 'monto_base')
+    op.drop_column('comisiones', 'cantidad')
     op.drop_column('comisiones', 'estado')
     op.drop_column('comisiones', 'empresa_id')
-    op.drop_column('comisiones', 'creado_por')
-    op.drop_column('comisiones', 'base')
-    op.drop_column('comisiones', 'factura_id')
-    op.drop_column('comisiones', 'monto_base')
-    op.drop_column('comisiones', 'regla_id')
-    op.drop_column('comisiones', 'factura_detalle_id')
-    op.drop_column('comisiones', 'cantidad')
-    op.drop_column('comisiones', 'perfil_laboral_id')
-    op.drop_column('comisiones', 'creado_en')
-    op.drop_column('comisiones', 'rol')
+    op.drop_column('comisiones', 'tipo')
     op.drop_column('comisiones', 'monto_comision')
+    op.drop_column('comisiones', 'perfil_laboral_id')
+    op.drop_column('comisiones', 'factura_id')
+    op.drop_column('comisiones', 'base')
+    op.drop_column('comisiones', 'valor_aplicado')
+    op.drop_column('comisiones', 'rol')
+    op.drop_column('comisiones', 'factura_detalle_id')
+    op.drop_column('comisiones', 'regla_id')
+    op.drop_column('comisiones', 'creado_por')
+    op.execute("DROP TABLE IF EXISTS reglas_comision CASCADE")
     op.add_column('empresas', sa.Column('razon_social', sa.String(length=255), nullable=True))
     op.add_column('empresas', sa.Column('rfc', sa.String(length=13), nullable=True))
     op.add_column('empresas', sa.Column('direccion', sa.Text(), nullable=True))
@@ -192,46 +163,44 @@ def upgrade() -> None:
     op.drop_index(op.f('idx_empresas_nombre'), table_name='empresas')
     op.create_unique_constraint(None, 'empresas', ['rfc'])
     op.create_unique_constraint(None, 'empresas', ['nombre'])
-    op.drop_column('empresas', 'plan')
-    op.drop_column('empresas', 'activo')
     op.drop_column('empresas', 'creado_en')
     op.drop_column('empresas', 'tipo')
+    op.drop_column('empresas', 'plan')
+    op.drop_column('empresas', 'activo')
     op.alter_column('facturas', 'id',
                existing_type=sa.UUID(),
-               type_=sa.Integer(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               server_default=None,
+               existing_nullable=False)
     op.alter_column('facturas', 'total',
                existing_type=sa.NUMERIC(precision=12, scale=2),
                server_default=None,
                type_=sa.Integer(),
                nullable=True)
     op.drop_index(op.f('uq_fact_empresa_tipo_serie_num'), table_name='facturas')
+    op.drop_constraint(op.f('facturas_instalador_id_fkey'), 'facturas', type_='foreignkey')
+    op.drop_constraint(op.f('facturas_orden_id_fkey'), 'facturas', type_='foreignkey')
     op.drop_constraint(op.f('facturas_vendedor_id_fkey'), 'facturas', type_='foreignkey')
+    op.drop_constraint(op.f('facturas_zona_id_fkey'), 'facturas', type_='foreignkey')
+    op.drop_constraint(op.f('facturas_empresa_id_fkey'), 'facturas', type_='foreignkey')
     op.drop_constraint(op.f('facturas_cliente_id_fkey'), 'facturas', type_='foreignkey')
     op.drop_constraint(op.f('facturas_creado_por_fkey'), 'facturas', type_='foreignkey')
-    op.drop_constraint(op.f('facturas_zona_id_fkey'), 'facturas', type_='foreignkey')
-    op.drop_constraint(op.f('facturas_orden_id_fkey'), 'facturas', type_='foreignkey')
-    op.drop_constraint(op.f('facturas_empresa_id_fkey'), 'facturas', type_='foreignkey')
-    op.drop_constraint(op.f('facturas_instalador_id_fkey'), 'facturas', type_='foreignkey')
-    op.drop_column('facturas', 'descuento')
-    op.drop_column('facturas', 'tipo')
-    op.drop_column('facturas', 'zona_id')
-    op.drop_column('facturas', 'numero')
-    op.drop_column('facturas', 'estado')
-    op.drop_column('facturas', 'impuesto')
-    op.drop_column('facturas', 'moneda')
-    op.drop_column('facturas', 'empresa_id')
+    op.drop_column('facturas', 'creado_en')
     op.drop_column('facturas', 'creado_por')
     op.drop_column('facturas', 'subtotal')
-    op.drop_column('facturas', 'cliente_id')
-    op.drop_column('facturas', 'instalador_id')
-    op.drop_column('facturas', 'orden_id')
-    op.drop_column('facturas', 'serie')
-    op.drop_column('facturas', 'vendedor_id')
+    op.drop_column('facturas', 'moneda')
     op.drop_column('facturas', 'fecha')
-    op.drop_column('facturas', 'creado_en')
+    op.drop_column('facturas', 'estado')
+    op.drop_column('facturas', 'empresa_id')
+    op.drop_column('facturas', 'tipo')
+    op.drop_column('facturas', 'descuento')
+    op.drop_column('facturas', 'serie')
+    op.drop_column('facturas', 'instalador_id')
+    op.drop_column('facturas', 'vendedor_id')
+    op.drop_column('facturas', 'zona_id')
+    op.drop_column('facturas', 'numero')
+    op.drop_column('facturas', 'cliente_id')
+    op.drop_column('facturas', 'impuesto')
+    op.drop_column('facturas', 'orden_id')
     op.alter_column('movimientos_inventario', 'id',
                existing_type=sa.UUID(),
                server_default=None,
@@ -249,75 +218,69 @@ def upgrade() -> None:
                server_default=None,
                type_=sa.DateTime(),
                existing_nullable=False)
-    op.drop_constraint(op.f('movimientos_inventario_tramo_id_fkey'), 'movimientos_inventario', type_='foreignkey')
     op.drop_constraint(op.f('movimientos_inventario_cristal_id_fkey'), 'movimientos_inventario', type_='foreignkey')
+    op.drop_constraint(op.f('movimientos_inventario_tramo_id_fkey'), 'movimientos_inventario', type_='foreignkey')
     op.create_foreign_key(None, 'movimientos_inventario', 'catalogo', ['cristal_id'], ['id'])
     op.drop_column('movimientos_inventario', 'tramo_id')
     op.add_column('ordenes', sa.Column('description', sa.String(), nullable=True))
     op.alter_column('ordenes', 'id',
                existing_type=sa.UUID(),
-               type_=sa.Integer(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               server_default=None,
+               existing_nullable=False)
     op.drop_index(op.f('uq_orden_empresa_num'), table_name='ordenes')
-    op.drop_constraint(op.f('ordenes_vendedor_id_fkey'), 'ordenes', type_='foreignkey')
-    op.drop_constraint(op.f('ordenes_instalador_id_fkey'), 'ordenes', type_='foreignkey')
     op.drop_constraint(op.f('ordenes_empresa_id_fkey'), 'ordenes', type_='foreignkey')
-    op.drop_constraint(op.f('ordenes_zona_id_fkey'), 'ordenes', type_='foreignkey')
-    op.drop_constraint(op.f('ordenes_aseguradora_id_fkey'), 'ordenes', type_='foreignkey')
-    op.drop_constraint(op.f('ordenes_vehiculo_id_fkey'), 'ordenes', type_='foreignkey')
-    op.drop_constraint(op.f('ordenes_almacen_salida_id_fkey'), 'ordenes', type_='foreignkey')
-    op.drop_constraint(op.f('ordenes_cliente_id_fkey'), 'ordenes', type_='foreignkey')
-    op.drop_constraint(op.f('ordenes_creado_por_fkey'), 'ordenes', type_='foreignkey')
     op.drop_constraint(op.f('ordenes_taller_id_fkey'), 'ordenes', type_='foreignkey')
+    op.drop_constraint(op.f('ordenes_cliente_id_fkey'), 'ordenes', type_='foreignkey')
+    op.drop_constraint(op.f('ordenes_vendedor_id_fkey'), 'ordenes', type_='foreignkey')
+    op.drop_constraint(op.f('ordenes_aseguradora_id_fkey'), 'ordenes', type_='foreignkey')
+    op.drop_constraint(op.f('ordenes_almacen_salida_id_fkey'), 'ordenes', type_='foreignkey')
+    op.drop_constraint(op.f('ordenes_creado_por_fkey'), 'ordenes', type_='foreignkey')
+    op.drop_constraint(op.f('ordenes_instalador_id_fkey'), 'ordenes', type_='foreignkey')
+    op.drop_constraint(op.f('ordenes_vehiculo_id_fkey'), 'ordenes', type_='foreignkey')
+    op.drop_constraint(op.f('ordenes_zona_id_fkey'), 'ordenes', type_='foreignkey')
+    op.drop_column('ordenes', 'creado_en')
+    op.drop_column('ordenes', 'aseguradora_id')
+    op.drop_column('ordenes', 'almacen_salida_id')
+    op.drop_column('ordenes', 'creado_por')
+    op.drop_column('ordenes', 'fecha')
+    op.drop_column('ordenes', 'estado')
+    op.drop_column('ordenes', 'empresa_id')
+    op.drop_column('ordenes', 'vehiculo_id')
+    op.drop_column('ordenes', 'origen')
+    op.drop_column('ordenes', 'instalador_id')
+    op.drop_column('ordenes', 'vendedor_id')
+    op.drop_column('ordenes', 'taller_id')
     op.drop_column('ordenes', 'zona_id')
     op.drop_column('ordenes', 'numero')
-    op.drop_column('ordenes', 'estado')
-    op.drop_column('ordenes', 'aseguradora_id')
-    op.drop_column('ordenes', 'empresa_id')
-    op.drop_column('ordenes', 'creado_por')
     op.drop_column('ordenes', 'cliente_id')
-    op.drop_column('ordenes', 'vehiculo_id')
-    op.drop_column('ordenes', 'instalador_id')
-    op.drop_column('ordenes', 'almacen_salida_id')
-    op.drop_column('ordenes', 'fecha')
-    op.drop_column('ordenes', 'vendedor_id')
-    op.drop_column('ordenes', 'origen')
     op.drop_column('ordenes', 'observacion')
-    op.drop_column('ordenes', 'creado_en')
-    op.drop_column('ordenes', 'taller_id')
     op.add_column('pagos', sa.Column('amount', sa.Integer(), nullable=True))
     op.alter_column('pagos', 'id',
                existing_type=sa.UUID(),
-               type_=sa.Integer(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
-    op.drop_constraint(op.f('pagos_factura_id_fkey'), 'pagos', type_='foreignkey')
+               server_default=None,
+               existing_nullable=False)
     op.drop_constraint(op.f('pagos_recibido_por_fkey'), 'pagos', type_='foreignkey')
+    op.drop_constraint(op.f('pagos_factura_id_fkey'), 'pagos', type_='foreignkey')
     op.drop_constraint(op.f('pagos_empresa_id_fkey'), 'pagos', type_='foreignkey')
+    op.drop_column('pagos', 'creado_en')
+    op.drop_column('pagos', 'referencia')
     op.drop_column('pagos', 'monto')
     op.drop_column('pagos', 'fecha')
-    op.drop_column('pagos', 'referencia')
-    op.drop_column('pagos', 'factura_id')
-    op.drop_column('pagos', 'metodo')
-    op.drop_column('pagos', 'creado_en')
     op.drop_column('pagos', 'empresa_id')
+    op.drop_column('pagos', 'metodo')
+    op.drop_column('pagos', 'factura_id')
     op.drop_column('pagos', 'recibido_por')
     op.add_column('roles', sa.Column('name', sa.String(), nullable=True))
     op.alter_column('roles', 'id',
                existing_type=sa.UUID(),
-               type_=sa.Integer(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               server_default=None,
+               existing_nullable=False)
     op.drop_index(op.f('uq_rol_empresa_nombre'), table_name='roles')
     op.drop_constraint(op.f('roles_empresa_id_fkey'), 'roles', type_='foreignkey')
-    op.drop_column('roles', 'empresa_id')
     op.drop_column('roles', 'descripcion')
-    op.drop_column('roles', 'activo')
     op.drop_column('roles', 'nombre')
+    op.drop_column('roles', 'activo')
+    op.drop_column('roles', 'empresa_id')
     op.add_column('stock_config', sa.Column('stock_max', sa.Integer(), nullable=False))
     op.alter_column('stock_config', 'id',
                existing_type=sa.UUID(),
@@ -360,94 +323,109 @@ def upgrade() -> None:
                existing_nullable=False)
     op.drop_index(op.f('uq_usuario_empresa_email'), table_name='usuarios')
     op.drop_index(op.f('uq_usuario_empresa_username'), table_name='usuarios')
-    op.create_unique_constraint(None, 'usuarios', ['username'])
     op.create_unique_constraint(None, 'usuarios', ['email'])
-    op.drop_column('usuarios', 'ultimo_login')
+    op.create_unique_constraint(None, 'usuarios', ['username'])
     op.drop_column('usuarios', 'creado_en')
+    op.drop_column('usuarios', 'ultimo_login')
     op.add_column('vehiculos', sa.Column('plate', sa.String(), nullable=True))
     op.alter_column('vehiculos', 'id',
                existing_type=sa.UUID(),
-               type_=sa.Integer(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               server_default=None,
+               existing_nullable=False)
     op.drop_index(op.f('uq_vehiculo_empresa_placa'), table_name='vehiculos')
     op.drop_index(op.f('uq_vehiculo_empresa_vin'), table_name='vehiculos')
     op.drop_constraint(op.f('vehiculos_cliente_id_fkey'), 'vehiculos', type_='foreignkey')
     op.drop_constraint(op.f('vehiculos_zona_id_fkey'), 'vehiculos', type_='foreignkey')
     op.drop_constraint(op.f('vehiculos_empresa_id_fkey'), 'vehiculos', type_='foreignkey')
-    op.drop_column('vehiculos', 'cliente_id')
+    op.drop_column('vehiculos', 'creado_en')
+    op.drop_column('vehiculos', 'marca')
     op.drop_column('vehiculos', 'vin')
-    op.drop_column('vehiculos', 'modelo')
     op.drop_column('vehiculos', 'anio')
     op.drop_column('vehiculos', 'color')
+    op.drop_column('vehiculos', 'modelo')
     op.drop_column('vehiculos', 'zona_id')
-    op.drop_column('vehiculos', 'marca')
-    op.drop_column('vehiculos', 'creado_en')
-    op.drop_column('vehiculos', 'empresa_id')
     op.drop_column('vehiculos', 'placa')
+    op.drop_column('vehiculos', 'cliente_id')
+    op.drop_column('vehiculos', 'empresa_id')
     op.add_column('zonas', sa.Column('name', sa.String(), nullable=True))
     op.alter_column('zonas', 'id',
                existing_type=sa.UUID(),
-               type_=sa.Integer(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               server_default=None,
+               existing_nullable=False)
     op.drop_index(op.f('uq_zona_empresa_nombre'), table_name='zonas')
     op.drop_constraint(op.f('zonas_empresa_id_fkey'), 'zonas', type_='foreignkey')
     op.drop_column('zonas', 'provincia')
+    op.drop_column('zonas', 'activo')
+    op.drop_column('zonas', 'nombre')
+    op.drop_column('zonas', 'empresa_id')
+    op.drop_column('zonas', 'municipio')
     op.drop_column('zonas', 'sector')
     op.drop_column('zonas', 'pais')
-    op.drop_column('zonas', 'municipio')
-    op.drop_column('zonas', 'activo')
-    op.drop_column('zonas', 'empresa_id')
-    op.drop_column('zonas', 'nombre')
+    op.drop_index(op.f('uq_rol_permiso_empresa'), table_name='rol_permisos')
+    op.execute("DROP TABLE IF EXISTS rol_permisos CASCADE")
+    op.drop_index(op.f('uq_usuario_rol_empresa'), table_name='usuario_roles')
+    op.execute("DROP TABLE IF EXISTS usuario_roles CASCADE")
+    op.drop_index(op.f('idx_compat_marca_modelo'), table_name='compatibilidad')
+    op.execute("DROP TABLE IF EXISTS compatibilidad CASCADE")
+    op.drop_index(op.f('uq_tramo_item'), table_name='tramo_items')
+    op.execute("DROP TABLE IF EXISTS tramo_items CASCADE")
+    op.execute("DROP TABLE IF EXISTS factura_detalle CASCADE")
+    op.execute("DROP TABLE IF EXISTS liquidacion_detalle CASCADE")
+    op.execute("DROP TABLE IF EXISTS orden_detalle CASCADE")
+    op.execute("DROP TABLE IF EXISTS roturas_cristales CASCADE")
+    op.execute("DROP TABLE IF EXISTS permisos CASCADE")
+    op.drop_index(op.f('idx_tramo_ref'), table_name='tramos')
+    op.execute("DROP TABLE IF EXISTS tramos CASCADE")
+    op.drop_index(op.f('uq_perfil_laboral_usuario_tipo'), table_name='usuario_perfil_laboral')
+    op.execute("DROP TABLE IF EXISTS liquidaciones CASCADE")
+    op.execute("DROP TABLE IF EXISTS usuario_perfil_laboral CASCADE")
+    op.drop_index(op.f('uq_seq_empresa_tipo_serie'), table_name='secuencias_documentos')
+    op.execute("DROP TABLE IF EXISTS secuencias_documentos CASCADE")
+    op.execute("DROP TABLE IF EXISTS sesiones CASCADE")
+    op.execute("DROP TABLE IF EXISTS auditoria_eventos CASCADE")
+    op.execute("DROP TABLE IF EXISTS reglas_comision CASCADE")
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
-    op.add_column('zonas', sa.Column('nombre', sa.TEXT(), autoincrement=False, nullable=False))
-    op.add_column('zonas', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('zonas', sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False))
-    op.add_column('zonas', sa.Column('municipio', sa.TEXT(), autoincrement=False, nullable=True))
     op.add_column('zonas', sa.Column('pais', sa.TEXT(), server_default=sa.text("'DO'::text"), autoincrement=False, nullable=False))
     op.add_column('zonas', sa.Column('sector', sa.TEXT(), autoincrement=False, nullable=True))
+    op.add_column('zonas', sa.Column('municipio', sa.TEXT(), autoincrement=False, nullable=True))
+    op.add_column('zonas', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
+    op.add_column('zonas', sa.Column('nombre', sa.TEXT(), autoincrement=False, nullable=False))
+    op.add_column('zonas', sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False))
     op.add_column('zonas', sa.Column('provincia', sa.TEXT(), autoincrement=False, nullable=True))
     op.create_foreign_key(op.f('zonas_empresa_id_fkey'), 'zonas', 'empresas', ['empresa_id'], ['id'])
     op.create_index(op.f('uq_zona_empresa_nombre'), 'zonas', ['empresa_id', 'nombre'], unique=True)
     op.alter_column('zonas', 'id',
-               existing_type=sa.Integer(),
-               type_=sa.UUID(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               existing_type=sa.UUID(),
+               server_default=sa.text('gen_random_uuid()'),
+               existing_nullable=False)
     op.drop_column('zonas', 'name')
-    op.add_column('vehiculos', sa.Column('placa', sa.TEXT(), autoincrement=False, nullable=True))
     op.add_column('vehiculos', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('vehiculos', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
-    op.add_column('vehiculos', sa.Column('marca', sa.TEXT(), autoincrement=False, nullable=False))
+    op.add_column('vehiculos', sa.Column('cliente_id', sa.UUID(), autoincrement=False, nullable=False))
+    op.add_column('vehiculos', sa.Column('placa', sa.TEXT(), autoincrement=False, nullable=True))
     op.add_column('vehiculos', sa.Column('zona_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('vehiculos', sa.Column('modelo', sa.TEXT(), autoincrement=False, nullable=False))
     op.add_column('vehiculos', sa.Column('color', sa.TEXT(), autoincrement=False, nullable=True))
     op.add_column('vehiculos', sa.Column('anio', sa.INTEGER(), autoincrement=False, nullable=True))
-    op.add_column('vehiculos', sa.Column('modelo', sa.TEXT(), autoincrement=False, nullable=False))
     op.add_column('vehiculos', sa.Column('vin', sa.TEXT(), autoincrement=False, nullable=True))
-    op.add_column('vehiculos', sa.Column('cliente_id', sa.UUID(), autoincrement=False, nullable=False))
+    op.add_column('vehiculos', sa.Column('marca', sa.TEXT(), autoincrement=False, nullable=False))
+    op.add_column('vehiculos', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.create_foreign_key(op.f('vehiculos_empresa_id_fkey'), 'vehiculos', 'empresas', ['empresa_id'], ['id'])
     op.create_foreign_key(op.f('vehiculos_zona_id_fkey'), 'vehiculos', 'zonas', ['zona_id'], ['id'])
     op.create_foreign_key(op.f('vehiculos_cliente_id_fkey'), 'vehiculos', 'clientes', ['cliente_id'], ['id'])
     op.create_index(op.f('uq_vehiculo_empresa_vin'), 'vehiculos', ['empresa_id', 'vin'], unique=True)
     op.create_index(op.f('uq_vehiculo_empresa_placa'), 'vehiculos', ['empresa_id', 'placa'], unique=True)
     op.alter_column('vehiculos', 'id',
-               existing_type=sa.Integer(),
-               type_=sa.UUID(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               existing_type=sa.UUID(),
+               server_default=sa.text('gen_random_uuid()'),
+               existing_nullable=False)
     op.drop_column('vehiculos', 'plate')
-    op.add_column('usuarios', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.add_column('usuarios', sa.Column('ultimo_login', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True))
+    op.add_column('usuarios', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.drop_constraint(None, 'usuarios', type_='unique')
     op.drop_constraint(None, 'usuarios', type_='unique')
     op.create_index(op.f('uq_usuario_empresa_username'), 'usuarios', ['empresa_id', 'username'], unique=True)
@@ -492,75 +470,69 @@ def downgrade() -> None:
                server_default=sa.text('gen_random_uuid()'),
                existing_nullable=False)
     op.drop_column('stock_config', 'stock_max')
-    op.add_column('roles', sa.Column('nombre', sa.TEXT(), autoincrement=False, nullable=False))
-    op.add_column('roles', sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False))
-    op.add_column('roles', sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=True))
     op.add_column('roles', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
+    op.add_column('roles', sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False))
+    op.add_column('roles', sa.Column('nombre', sa.TEXT(), autoincrement=False, nullable=False))
+    op.add_column('roles', sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=True))
     op.create_foreign_key(op.f('roles_empresa_id_fkey'), 'roles', 'empresas', ['empresa_id'], ['id'])
     op.create_index(op.f('uq_rol_empresa_nombre'), 'roles', ['empresa_id', 'nombre'], unique=True)
     op.alter_column('roles', 'id',
-               existing_type=sa.Integer(),
-               type_=sa.UUID(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               existing_type=sa.UUID(),
+               server_default=sa.text('gen_random_uuid()'),
+               existing_nullable=False)
     op.drop_column('roles', 'name')
     op.add_column('pagos', sa.Column('recibido_por', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('pagos', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('pagos', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
-    op.add_column('pagos', sa.Column('metodo', postgresql.ENUM('EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'CHEQUE', name='metodo_pago'), autoincrement=False, nullable=False))
     op.add_column('pagos', sa.Column('factura_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('pagos', sa.Column('referencia', sa.TEXT(), autoincrement=False, nullable=True))
+    op.add_column('pagos', sa.Column('metodo', postgresql.ENUM('EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'CHEQUE', name='metodo_pago'), autoincrement=False, nullable=False))
+    op.add_column('pagos', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
     op.add_column('pagos', sa.Column('fecha', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.add_column('pagos', sa.Column('monto', sa.NUMERIC(precision=12, scale=2), autoincrement=False, nullable=False))
+    op.add_column('pagos', sa.Column('referencia', sa.TEXT(), autoincrement=False, nullable=True))
+    op.add_column('pagos', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.create_foreign_key(op.f('pagos_empresa_id_fkey'), 'pagos', 'empresas', ['empresa_id'], ['id'])
-    op.create_foreign_key(op.f('pagos_recibido_por_fkey'), 'pagos', 'usuarios', ['recibido_por'], ['id'])
     op.create_foreign_key(op.f('pagos_factura_id_fkey'), 'pagos', 'facturas', ['factura_id'], ['id'])
+    op.create_foreign_key(op.f('pagos_recibido_por_fkey'), 'pagos', 'usuarios', ['recibido_por'], ['id'])
     op.alter_column('pagos', 'id',
-               existing_type=sa.Integer(),
-               type_=sa.UUID(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               existing_type=sa.UUID(),
+               server_default=sa.text('gen_random_uuid()'),
+               existing_nullable=False)
     op.drop_column('pagos', 'amount')
-    op.add_column('ordenes', sa.Column('taller_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('ordenes', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.add_column('ordenes', sa.Column('observacion', sa.TEXT(), autoincrement=False, nullable=True))
-    op.add_column('ordenes', sa.Column('origen', postgresql.ENUM('PARTICULAR', 'TALLER', 'ASEGURADOR', name='origen_orden'), server_default=sa.text("'PARTICULAR'::origen_orden"), autoincrement=False, nullable=False))
-    op.add_column('ordenes', sa.Column('vendedor_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('ordenes', sa.Column('fecha', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
-    op.add_column('ordenes', sa.Column('almacen_salida_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('ordenes', sa.Column('instalador_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('ordenes', sa.Column('vehiculo_id', sa.UUID(), autoincrement=False, nullable=True))
     op.add_column('ordenes', sa.Column('cliente_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('ordenes', sa.Column('creado_por', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('ordenes', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('ordenes', sa.Column('aseguradora_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('ordenes', sa.Column('estado', postgresql.ENUM('PENDIENTE', 'EN_PROGRESO', 'COMPLETADA', 'CANCELADA', name='estado_orden'), autoincrement=False, nullable=False))
     op.add_column('ordenes', sa.Column('numero', sa.BIGINT(), autoincrement=False, nullable=False))
     op.add_column('ordenes', sa.Column('zona_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.create_foreign_key(op.f('ordenes_taller_id_fkey'), 'ordenes', 'clientes', ['taller_id'], ['id'])
-    op.create_foreign_key(op.f('ordenes_creado_por_fkey'), 'ordenes', 'usuarios', ['creado_por'], ['id'])
-    op.create_foreign_key(op.f('ordenes_cliente_id_fkey'), 'ordenes', 'clientes', ['cliente_id'], ['id'])
-    op.create_foreign_key(op.f('ordenes_almacen_salida_id_fkey'), 'ordenes', 'almacenes', ['almacen_salida_id'], ['id'])
-    op.create_foreign_key(op.f('ordenes_vehiculo_id_fkey'), 'ordenes', 'vehiculos', ['vehiculo_id'], ['id'])
-    op.create_foreign_key(op.f('ordenes_aseguradora_id_fkey'), 'ordenes', 'clientes', ['aseguradora_id'], ['id'])
+    op.add_column('ordenes', sa.Column('taller_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('ordenes', sa.Column('vendedor_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('ordenes', sa.Column('instalador_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('ordenes', sa.Column('origen', postgresql.ENUM('PARTICULAR', 'TALLER', 'ASEGURADOR', name='origen_orden'), server_default=sa.text("'PARTICULAR'::origen_orden"), autoincrement=False, nullable=False))
+    op.add_column('ordenes', sa.Column('vehiculo_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('ordenes', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
+    op.add_column('ordenes', sa.Column('estado', postgresql.ENUM('PENDIENTE', 'EN_PROGRESO', 'COMPLETADA', 'CANCELADA', name='estado_orden'), autoincrement=False, nullable=False))
+    op.add_column('ordenes', sa.Column('fecha', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
+    op.add_column('ordenes', sa.Column('creado_por', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('ordenes', sa.Column('almacen_salida_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('ordenes', sa.Column('aseguradora_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('ordenes', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.create_foreign_key(op.f('ordenes_zona_id_fkey'), 'ordenes', 'zonas', ['zona_id'], ['id'])
-    op.create_foreign_key(op.f('ordenes_empresa_id_fkey'), 'ordenes', 'empresas', ['empresa_id'], ['id'])
+    op.create_foreign_key(op.f('ordenes_vehiculo_id_fkey'), 'ordenes', 'vehiculos', ['vehiculo_id'], ['id'])
     op.create_foreign_key(op.f('ordenes_instalador_id_fkey'), 'ordenes', 'usuario_perfil_laboral', ['instalador_id'], ['id'])
+    op.create_foreign_key(op.f('ordenes_creado_por_fkey'), 'ordenes', 'usuarios', ['creado_por'], ['id'])
+    op.create_foreign_key(op.f('ordenes_almacen_salida_id_fkey'), 'ordenes', 'almacenes', ['almacen_salida_id'], ['id'])
+    op.create_foreign_key(op.f('ordenes_aseguradora_id_fkey'), 'ordenes', 'clientes', ['aseguradora_id'], ['id'])
     op.create_foreign_key(op.f('ordenes_vendedor_id_fkey'), 'ordenes', 'usuario_perfil_laboral', ['vendedor_id'], ['id'])
+    op.create_foreign_key(op.f('ordenes_cliente_id_fkey'), 'ordenes', 'clientes', ['cliente_id'], ['id'])
+    op.create_foreign_key(op.f('ordenes_taller_id_fkey'), 'ordenes', 'clientes', ['taller_id'], ['id'])
+    op.create_foreign_key(op.f('ordenes_empresa_id_fkey'), 'ordenes', 'empresas', ['empresa_id'], ['id'])
     op.create_index(op.f('uq_orden_empresa_num'), 'ordenes', ['empresa_id', 'numero'], unique=True)
     op.alter_column('ordenes', 'id',
-               existing_type=sa.Integer(),
-               type_=sa.UUID(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               existing_type=sa.UUID(),
+               server_default=sa.text('gen_random_uuid()'),
+               existing_nullable=False)
     op.drop_column('ordenes', 'description')
     op.add_column('movimientos_inventario', sa.Column('tramo_id', sa.UUID(), autoincrement=False, nullable=True))
     op.drop_constraint(None, 'movimientos_inventario', type_='foreignkey')
-    op.create_foreign_key(op.f('movimientos_inventario_cristal_id_fkey'), 'movimientos_inventario', 'cristales', ['cristal_id'], ['id'])
     op.create_foreign_key(op.f('movimientos_inventario_tramo_id_fkey'), 'movimientos_inventario', 'tramos', ['tramo_id'], ['id'])
+    op.create_foreign_key(op.f('movimientos_inventario_cristal_id_fkey'), 'movimientos_inventario', 'cristales', ['cristal_id'], ['id'])
     op.alter_column('movimientos_inventario', 'creado_en',
                existing_type=sa.DateTime(),
                server_default=sa.text('now()'),
@@ -578,30 +550,30 @@ def downgrade() -> None:
                existing_type=sa.UUID(),
                server_default=sa.text('gen_random_uuid()'),
                existing_nullable=False)
-    op.add_column('facturas', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
-    op.add_column('facturas', sa.Column('fecha', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
-    op.add_column('facturas', sa.Column('vendedor_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('facturas', sa.Column('serie', sa.TEXT(), server_default=sa.text("'A'::text"), autoincrement=False, nullable=False))
     op.add_column('facturas', sa.Column('orden_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('facturas', sa.Column('instalador_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('facturas', sa.Column('cliente_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('facturas', sa.Column('subtotal', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False))
-    op.add_column('facturas', sa.Column('creado_por', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('facturas', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('facturas', sa.Column('moneda', sa.TEXT(), server_default=sa.text("'DOP'::text"), autoincrement=False, nullable=False))
     op.add_column('facturas', sa.Column('impuesto', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False))
-    op.add_column('facturas', sa.Column('estado', postgresql.ENUM('EMITIDA', 'ANULADA', 'PAGADA', name='estado_factura'), server_default=sa.text("'EMITIDA'::estado_factura"), autoincrement=False, nullable=False))
+    op.add_column('facturas', sa.Column('cliente_id', sa.UUID(), autoincrement=False, nullable=False))
     op.add_column('facturas', sa.Column('numero', sa.BIGINT(), autoincrement=False, nullable=False))
     op.add_column('facturas', sa.Column('zona_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('facturas', sa.Column('tipo', postgresql.ENUM('FACTURA', 'NOTA_CREDITO', 'REMISION', name='tipo_documento'), autoincrement=False, nullable=False))
+    op.add_column('facturas', sa.Column('vendedor_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('facturas', sa.Column('instalador_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('facturas', sa.Column('serie', sa.TEXT(), server_default=sa.text("'A'::text"), autoincrement=False, nullable=False))
     op.add_column('facturas', sa.Column('descuento', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False))
-    op.create_foreign_key(op.f('facturas_instalador_id_fkey'), 'facturas', 'usuario_perfil_laboral', ['instalador_id'], ['id'])
-    op.create_foreign_key(op.f('facturas_empresa_id_fkey'), 'facturas', 'empresas', ['empresa_id'], ['id'])
-    op.create_foreign_key(op.f('facturas_orden_id_fkey'), 'facturas', 'ordenes', ['orden_id'], ['id'])
-    op.create_foreign_key(op.f('facturas_zona_id_fkey'), 'facturas', 'zonas', ['zona_id'], ['id'])
+    op.add_column('facturas', sa.Column('tipo', postgresql.ENUM('FACTURA', 'NOTA_CREDITO', 'REMISION', name='tipo_documento'), autoincrement=False, nullable=False))
+    op.add_column('facturas', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
+    op.add_column('facturas', sa.Column('estado', postgresql.ENUM('EMITIDA', 'ANULADA', 'PAGADA', name='estado_factura'), server_default=sa.text("'EMITIDA'::estado_factura"), autoincrement=False, nullable=False))
+    op.add_column('facturas', sa.Column('fecha', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
+    op.add_column('facturas', sa.Column('moneda', sa.TEXT(), server_default=sa.text("'DOP'::text"), autoincrement=False, nullable=False))
+    op.add_column('facturas', sa.Column('subtotal', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False))
+    op.add_column('facturas', sa.Column('creado_por', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('facturas', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.create_foreign_key(op.f('facturas_creado_por_fkey'), 'facturas', 'usuarios', ['creado_por'], ['id'])
     op.create_foreign_key(op.f('facturas_cliente_id_fkey'), 'facturas', 'clientes', ['cliente_id'], ['id'])
+    op.create_foreign_key(op.f('facturas_empresa_id_fkey'), 'facturas', 'empresas', ['empresa_id'], ['id'])
+    op.create_foreign_key(op.f('facturas_zona_id_fkey'), 'facturas', 'zonas', ['zona_id'], ['id'])
     op.create_foreign_key(op.f('facturas_vendedor_id_fkey'), 'facturas', 'usuario_perfil_laboral', ['vendedor_id'], ['id'])
+    op.create_foreign_key(op.f('facturas_orden_id_fkey'), 'facturas', 'ordenes', ['orden_id'], ['id'])
+    op.create_foreign_key(op.f('facturas_instalador_id_fkey'), 'facturas', 'usuario_perfil_laboral', ['instalador_id'], ['id'])
     op.create_index(op.f('uq_fact_empresa_tipo_serie_num'), 'facturas', ['empresa_id', 'tipo', 'serie', 'numero'], unique=True)
     op.alter_column('facturas', 'total',
                existing_type=sa.Integer(),
@@ -609,15 +581,13 @@ def downgrade() -> None:
                type_=sa.NUMERIC(precision=12, scale=2),
                nullable=False)
     op.alter_column('facturas', 'id',
-               existing_type=sa.Integer(),
-               type_=sa.UUID(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
-    op.add_column('empresas', sa.Column('tipo', postgresql.ENUM('TALLER', 'DISTRIBUIDOR', 'FABRICANTE', name='tipo_empresa'), server_default=sa.text("'TALLER'::tipo_empresa"), autoincrement=False, nullable=False))
-    op.add_column('empresas', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
+               existing_type=sa.UUID(),
+               server_default=sa.text('gen_random_uuid()'),
+               existing_nullable=False)
     op.add_column('empresas', sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False))
     op.add_column('empresas', sa.Column('plan', postgresql.ENUM('BASIC', 'PROFESSIONAL', 'ENTERPRISE', name='plan_saas'), server_default=sa.text("'BASIC'::plan_saas"), autoincrement=False, nullable=False))
+    op.add_column('empresas', sa.Column('tipo', postgresql.ENUM('TALLER', 'DISTRIBUIDOR', 'FABRICANTE', name='tipo_empresa'), server_default=sa.text("'TALLER'::tipo_empresa"), autoincrement=False, nullable=False))
+    op.add_column('empresas', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.drop_constraint(None, 'empresas', type_='unique')
     op.drop_constraint(None, 'empresas', type_='unique')
     op.create_index(op.f('idx_empresas_nombre'), 'empresas', ['nombre'], unique=False)
@@ -646,56 +616,52 @@ def downgrade() -> None:
     op.drop_column('empresas', 'direccion')
     op.drop_column('empresas', 'rfc')
     op.drop_column('empresas', 'razon_social')
-    op.add_column('comisiones', sa.Column('monto_comision', sa.NUMERIC(precision=12, scale=2), autoincrement=False, nullable=False))
-    op.add_column('comisiones', sa.Column('rol', postgresql.ENUM('VENDEDOR', 'INSTALADOR', 'GERENTE', name='rol_comision'), autoincrement=False, nullable=False))
-    op.add_column('comisiones', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
-    op.add_column('comisiones', sa.Column('perfil_laboral_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('comisiones', sa.Column('cantidad', sa.INTEGER(), server_default=sa.text('1'), autoincrement=False, nullable=False))
-    op.add_column('comisiones', sa.Column('factura_detalle_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('comisiones', sa.Column('regla_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('comisiones', sa.Column('monto_base', sa.NUMERIC(precision=12, scale=2), autoincrement=False, nullable=False))
-    op.add_column('comisiones', sa.Column('factura_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('comisiones', sa.Column('base', postgresql.ENUM('PRECIO_VENTA', 'UTILIDAD', name='base_comision'), autoincrement=False, nullable=False))
     op.add_column('comisiones', sa.Column('creado_por', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('comisiones', sa.Column('regla_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('comisiones', sa.Column('factura_detalle_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('comisiones', sa.Column('rol', postgresql.ENUM('VENDEDOR', 'INSTALADOR', 'GERENTE', name='rol_comision'), autoincrement=False, nullable=False))
+    op.add_column('comisiones', sa.Column('valor_aplicado', sa.NUMERIC(precision=8, scale=4), autoincrement=False, nullable=False))
+    op.add_column('comisiones', sa.Column('base', postgresql.ENUM('PRECIO_VENTA', 'UTILIDAD', name='base_comision'), autoincrement=False, nullable=False))
+    op.add_column('comisiones', sa.Column('factura_id', sa.UUID(), autoincrement=False, nullable=False))
+    op.add_column('comisiones', sa.Column('perfil_laboral_id', sa.UUID(), autoincrement=False, nullable=False))
+    op.add_column('comisiones', sa.Column('monto_comision', sa.NUMERIC(precision=12, scale=2), autoincrement=False, nullable=False))
+    op.add_column('comisiones', sa.Column('tipo', postgresql.ENUM('PORCENTAJE', 'FIJO', name='tipo_comision'), autoincrement=False, nullable=False))
     op.add_column('comisiones', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
     op.add_column('comisiones', sa.Column('estado', postgresql.ENUM('PENDIENTE', 'LIQUIDADA', 'ANULADA', name='estado_comision'), server_default=sa.text("'PENDIENTE'::estado_comision"), autoincrement=False, nullable=False))
-    op.add_column('comisiones', sa.Column('valor_aplicado', sa.NUMERIC(precision=8, scale=4), autoincrement=False, nullable=False))
-    op.add_column('comisiones', sa.Column('tipo', postgresql.ENUM('PORCENTAJE', 'FIJO', name='tipo_comision'), autoincrement=False, nullable=False))
-    op.create_foreign_key(op.f('comisiones_empresa_id_fkey'), 'comisiones', 'empresas', ['empresa_id'], ['id'])
-    op.create_foreign_key(op.f('comisiones_creado_por_fkey'), 'comisiones', 'usuarios', ['creado_por'], ['id'])
-    op.create_foreign_key(op.f('comisiones_factura_id_fkey'), 'comisiones', 'facturas', ['factura_id'], ['id'])
-    op.create_foreign_key(op.f('comisiones_perfil_laboral_id_fkey'), 'comisiones', 'usuario_perfil_laboral', ['perfil_laboral_id'], ['id'])
+    op.add_column('comisiones', sa.Column('cantidad', sa.INTEGER(), server_default=sa.text('1'), autoincrement=False, nullable=False))
+    op.add_column('comisiones', sa.Column('monto_base', sa.NUMERIC(precision=12, scale=2), autoincrement=False, nullable=False))
+    op.add_column('comisiones', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.create_foreign_key(op.f('comisiones_regla_id_fkey'), 'comisiones', 'reglas_comision', ['regla_id'], ['id'])
+    op.create_foreign_key(op.f('comisiones_factura_id_fkey'), 'comisiones', 'facturas', ['factura_id'], ['id'])
+    op.create_foreign_key(op.f('comisiones_creado_por_fkey'), 'comisiones', 'usuarios', ['creado_por'], ['id'])
     op.create_foreign_key(op.f('comisiones_factura_detalle_id_fkey'), 'comisiones', 'factura_detalle', ['factura_detalle_id'], ['id'])
+    op.create_foreign_key(op.f('comisiones_perfil_laboral_id_fkey'), 'comisiones', 'usuario_perfil_laboral', ['perfil_laboral_id'], ['id'])
+    op.create_foreign_key(op.f('comisiones_empresa_id_fkey'), 'comisiones', 'empresas', ['empresa_id'], ['id'])
     op.alter_column('comisiones', 'id',
-               existing_type=sa.Integer(),
-               type_=sa.UUID(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               existing_type=sa.UUID(),
+               server_default=sa.text('gen_random_uuid()'),
+               existing_nullable=False)
     op.drop_column('comisiones', 'amount')
-    op.add_column('clientes', sa.Column('telefono_principal', sa.TEXT(), autoincrement=False, nullable=True))
-    op.add_column('clientes', sa.Column('direccion', sa.TEXT(), autoincrement=False, nullable=True))
-    op.add_column('clientes', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
-    op.add_column('clientes', sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False))
-    op.add_column('clientes', sa.Column('documento_tipo', postgresql.ENUM('CEDULA', 'RNC', 'PASAPORTE', name='tipo_documento_id'), autoincrement=False, nullable=True))
-    op.add_column('clientes', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
-    op.add_column('clientes', sa.Column('documento_numero', sa.TEXT(), autoincrement=False, nullable=True))
-    op.add_column('clientes', sa.Column('zona_id', sa.UUID(), autoincrement=False, nullable=True))
-    op.add_column('clientes', sa.Column('tipo', postgresql.ENUM('PERSONA', 'EMPRESA', name='tipo_cliente'), autoincrement=False, nullable=False))
     op.add_column('clientes', sa.Column('email_principal', sa.TEXT(), autoincrement=False, nullable=True))
+    op.add_column('clientes', sa.Column('documento_tipo', postgresql.ENUM('CEDULA', 'RNC', 'PASAPORTE', name='tipo_documento_id'), autoincrement=False, nullable=True))
+    op.add_column('clientes', sa.Column('tipo', postgresql.ENUM('PERSONA', 'EMPRESA', name='tipo_cliente'), autoincrement=False, nullable=False))
+    op.add_column('clientes', sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False))
+    op.add_column('clientes', sa.Column('direccion', sa.TEXT(), autoincrement=False, nullable=True))
+    op.add_column('clientes', sa.Column('zona_id', sa.UUID(), autoincrement=False, nullable=True))
+    op.add_column('clientes', sa.Column('telefono_principal', sa.TEXT(), autoincrement=False, nullable=True))
     op.add_column('clientes', sa.Column('nombre_comercial', sa.TEXT(), autoincrement=False, nullable=False))
-    op.create_foreign_key(op.f('clientes_zona_id_fkey'), 'clientes', 'zonas', ['zona_id'], ['id'])
+    op.add_column('clientes', sa.Column('documento_numero', sa.TEXT(), autoincrement=False, nullable=True))
+    op.add_column('clientes', sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False))
+    op.add_column('clientes', sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False))
     op.create_foreign_key(op.f('clientes_empresa_id_fkey'), 'clientes', 'empresas', ['empresa_id'], ['id'])
+    op.create_foreign_key(op.f('clientes_zona_id_fkey'), 'clientes', 'zonas', ['zona_id'], ['id'])
     op.create_index(op.f('idx_clientes_tel'), 'clientes', ['empresa_id', 'telefono_principal'], unique=False)
     op.create_index(op.f('idx_clientes_nombre'), 'clientes', ['empresa_id', 'nombre_comercial'], unique=False)
     op.create_index(op.f('idx_clientes_doc'), 'clientes', ['empresa_id', 'documento_numero'], unique=False)
     op.alter_column('clientes', 'id',
-               existing_type=sa.Integer(),
-               type_=sa.UUID(),
-               existing_nullable=False,
-               autoincrement=True,
-               existing_server_default=sa.text('gen_random_uuid()'))
+               existing_type=sa.UUID(),
+               server_default=sa.text('gen_random_uuid()'),
+               existing_nullable=False)
     op.drop_column('clientes', 'name')
     op.add_column('almacenes', sa.Column('zona_id', sa.UUID(), autoincrement=False, nullable=True))
     op.create_foreign_key(op.f('almacenes_zona_id_fkey'), 'almacenes', 'zonas', ['zona_id'], ['id'])
@@ -745,6 +711,196 @@ def downgrade() -> None:
                existing_type=sa.UUID(),
                server_default=sa.text('gen_random_uuid()'),
                existing_nullable=False)
+    op.create_table('orden_detalle',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('orden_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('tipo_item', postgresql.ENUM('CRISTAL', 'TRAMO', 'SERVICIO', 'ACCESORIO', name='tipo_item_orden'), autoincrement=False, nullable=False),
+    sa.Column('cristal_id', sa.UUID(), autoincrement=False, nullable=True),
+    sa.Column('tramo_id', sa.UUID(), autoincrement=False, nullable=True),
+    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('cantidad', sa.INTEGER(), server_default=sa.text('1'), autoincrement=False, nullable=False),
+    sa.Column('precio_unit', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
+    sa.Column('descuento', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
+    sa.ForeignKeyConstraint(['cristal_id'], ['cristales.id'], name=op.f('orden_detalle_cristal_id_fkey')),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('orden_detalle_empresa_id_fkey')),
+    sa.ForeignKeyConstraint(['orden_id'], ['ordenes.id'], name=op.f('orden_detalle_orden_id_fkey')),
+    sa.ForeignKeyConstraint(['tramo_id'], ['tramos.id'], name=op.f('orden_detalle_tramo_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('orden_detalle_pkey'))
+    )
+    op.create_table('cristales',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('sku', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('tipo', postgresql.ENUM('STANDARD', 'TEMPLADO', 'BLINDADO', name='tipo_cristal'), autoincrement=False, nullable=False),
+    sa.Column('lado', postgresql.ENUM('IZQ', 'DER', 'AMBOS', name='lado_cristal'), autoincrement=False, nullable=True),
+    sa.Column('marca_cristal', sa.TEXT(), autoincrement=False, nullable=True),
+    sa.Column('costo', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
+    sa.Column('precio_base', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
+    sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False),
+    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('cristales_empresa_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('cristales_pkey'))
+    )
+    op.create_index(op.f('uq_cristal_empresa_sku'), 'cristales', ['empresa_id', 'sku'], unique=True)
+    op.create_index(op.f('idx_cristal_tipo'), 'cristales', ['empresa_id', 'tipo'], unique=False)
+    op.create_table('usuario_perfil_laboral',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('usuario_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('tipo', postgresql.ENUM('VENDEDOR', 'INSTALADOR', 'GERENTE', 'ADMINISTRATIVO', name='tipo_usuario_labor'), autoincrement=False, nullable=False),
+    sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False),
+    sa.Column('telefono', sa.TEXT(), autoincrement=False, nullable=True),
+    sa.Column('nota', sa.TEXT(), autoincrement=False, nullable=True),
+    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('usuario_perfil_laboral_empresa_id_fkey')),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuarios.id'], name=op.f('usuario_perfil_laboral_usuario_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('usuario_perfil_laboral_pkey'))
+    )
+    op.create_index(op.f('uq_perfil_laboral_usuario_tipo'), 'usuario_perfil_laboral', ['empresa_id', 'usuario_id', 'tipo'], unique=True)
+    op.create_table('tramo_items',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('tramo_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('cristal_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('cantidad_inicial', sa.INTEGER(), server_default=sa.text('0'), autoincrement=False, nullable=False),
+    sa.Column('cantidad_actual', sa.INTEGER(), server_default=sa.text('0'), autoincrement=False, nullable=False),
+    sa.ForeignKeyConstraint(['cristal_id'], ['cristales.id'], name=op.f('tramo_items_cristal_id_fkey')),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('tramo_items_empresa_id_fkey')),
+    sa.ForeignKeyConstraint(['tramo_id'], ['tramos.id'], name=op.f('tramo_items_tramo_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('tramo_items_pkey'))
+    )
+    op.create_index(op.f('uq_tramo_item'), 'tramo_items', ['empresa_id', 'tramo_id', 'cristal_id'], unique=True)
+    op.create_table('liquidaciones',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('rol', postgresql.ENUM('VENDEDOR', 'INSTALADOR', 'GERENTE', name='rol_comision'), autoincrement=False, nullable=False),
+    sa.Column('perfil_laboral_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('periodo_desde', sa.DATE(), autoincrement=False, nullable=False),
+    sa.Column('periodo_hasta', sa.DATE(), autoincrement=False, nullable=False),
+    sa.Column('total_comision', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
+    sa.Column('estado', postgresql.ENUM('ABIERTA', 'CERRADA', 'PAGADA', name='estado_liquidacion'), server_default=sa.text("'ABIERTA'::estado_liquidacion"), autoincrement=False, nullable=False),
+    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
+    sa.Column('creado_por', sa.UUID(), autoincrement=False, nullable=True),
+    sa.Column('cerrado_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True),
+    sa.Column('pagado_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True),
+    sa.Column('nota', sa.TEXT(), autoincrement=False, nullable=True),
+    sa.ForeignKeyConstraint(['creado_por'], ['usuarios.id'], name=op.f('liquidaciones_creado_por_fkey')),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('liquidaciones_empresa_id_fkey')),
+    sa.ForeignKeyConstraint(['perfil_laboral_id'], ['usuario_perfil_laboral.id'], name=op.f('liquidaciones_perfil_laboral_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('liquidaciones_pkey'))
+    )
+    op.create_table('auditoria_eventos',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('actor_id', sa.UUID(), autoincrement=False, nullable=True),
+    sa.Column('entidad', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('entidad_id', sa.UUID(), autoincrement=False, nullable=True),
+    sa.Column('accion', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('detalle', postgresql.JSON(astext_type=sa.Text()), autoincrement=False, nullable=True),
+    sa.Column('ip', sa.TEXT(), autoincrement=False, nullable=True),
+    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
+    sa.ForeignKeyConstraint(['actor_id'], ['usuarios.id'], name=op.f('auditoria_eventos_actor_id_fkey')),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('auditoria_eventos_empresa_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('auditoria_eventos_pkey'))
+    )
+    op.create_table('liquidacion_detalle',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('liquidacion_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('comision_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.ForeignKeyConstraint(['comision_id'], ['comisiones.id'], name=op.f('liquidacion_detalle_comision_id_fkey')),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('liquidacion_detalle_empresa_id_fkey')),
+    sa.ForeignKeyConstraint(['liquidacion_id'], ['liquidaciones.id'], name=op.f('liquidacion_detalle_liquidacion_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('liquidacion_detalle_pkey'))
+    )
+    op.create_table('factura_detalle',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('factura_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('cristal_id', sa.UUID(), autoincrement=False, nullable=True),
+    sa.Column('tramo_id', sa.UUID(), autoincrement=False, nullable=True),
+    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('cantidad', sa.INTEGER(), server_default=sa.text('1'), autoincrement=False, nullable=False),
+    sa.Column('precio_unit', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
+    sa.Column('descuento', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
+    sa.ForeignKeyConstraint(['cristal_id'], ['cristales.id'], name=op.f('factura_detalle_cristal_id_fkey')),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('factura_detalle_empresa_id_fkey')),
+    sa.ForeignKeyConstraint(['factura_id'], ['facturas.id'], name=op.f('factura_detalle_factura_id_fkey')),
+    sa.ForeignKeyConstraint(['tramo_id'], ['tramos.id'], name=op.f('factura_detalle_tramo_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('factura_detalle_pkey'))
+    )
+    op.create_table('secuencias_documentos',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('tipo', postgresql.ENUM('FACTURA', 'NOTA_CREDITO', 'REMISION', name='tipo_documento'), autoincrement=False, nullable=False),
+    sa.Column('serie', sa.TEXT(), server_default=sa.text("'A'::text"), autoincrement=False, nullable=False),
+    sa.Column('proximo_num', sa.BIGINT(), server_default=sa.text('1'), autoincrement=False, nullable=False),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('secuencias_documentos_empresa_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('secuencias_documentos_pkey'))
+    )
+    op.create_index(op.f('uq_seq_empresa_tipo_serie'), 'secuencias_documentos', ['empresa_id', 'tipo', 'serie'], unique=True)
+    op.create_table('sesiones',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('usuario_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('token_hash', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('estado', postgresql.ENUM('ACTIVA', 'REVOCADA', 'EXPIRADA', name='estado_sesion'), server_default=sa.text("'ACTIVA'::estado_sesion"), autoincrement=False, nullable=False),
+    sa.Column('ip', sa.TEXT(), autoincrement=False, nullable=True),
+    sa.Column('user_agent', sa.TEXT(), autoincrement=False, nullable=True),
+    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
+    sa.Column('expira_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=False),
+    sa.Column('revocado_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('sesiones_empresa_id_fkey')),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuarios.id'], name=op.f('sesiones_usuario_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('sesiones_pkey')),
+    sa.UniqueConstraint('token_hash', name=op.f('sesiones_token_hash_key'), postgresql_include=[], postgresql_nulls_not_distinct=False)
+    )
+    op.create_table('compatibilidad',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('cristal_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('marca', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('modelo', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('anio_desde', sa.INTEGER(), autoincrement=False, nullable=True),
+    sa.Column('anio_hasta', sa.INTEGER(), autoincrement=False, nullable=True),
+    sa.ForeignKeyConstraint(['cristal_id'], ['cristales.id'], name=op.f('compatibilidad_cristal_id_fkey')),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('compatibilidad_empresa_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('compatibilidad_pkey'))
+    )
+    op.create_index(op.f('idx_compat_marca_modelo'), 'compatibilidad', ['empresa_id', 'marca', 'modelo'], unique=False)
+    op.create_table('usuario_roles',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('usuario_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('rol_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('usuario_roles_empresa_id_fkey')),
+    sa.ForeignKeyConstraint(['rol_id'], ['roles.id'], name=op.f('usuario_roles_rol_id_fkey')),
+    sa.ForeignKeyConstraint(['usuario_id'], ['usuarios.id'], name=op.f('usuario_roles_usuario_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('usuario_roles_pkey'))
+    )
+    op.create_index(op.f('uq_usuario_rol_empresa'), 'usuario_roles', ['empresa_id', 'usuario_id', 'rol_id'], unique=True)
+    op.create_table('tramos',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('almacen_id', sa.UUID(), autoincrement=False, nullable=False),
+    sa.Column('nombre', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('referencia', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=True),
+    sa.Column('fecha_compra', sa.DATE(), autoincrement=False, nullable=True),
+    sa.Column('estado', sa.TEXT(), server_default=sa.text("'ABIERTO'::text"), autoincrement=False, nullable=False),
+    sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False),
+    sa.Column('creado_por', sa.UUID(), autoincrement=False, nullable=True),
+    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
+    sa.Column('actualizado_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True),
+    sa.ForeignKeyConstraint(['almacen_id'], ['almacenes.id'], name=op.f('tramos_almacen_id_fkey')),
+    sa.ForeignKeyConstraint(['creado_por'], ['usuarios.id'], name=op.f('tramos_creado_por_fkey')),
+    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('tramos_empresa_id_fkey')),
+    sa.PrimaryKeyConstraint('id', name=op.f('tramos_pkey'))
+    )
+    op.create_index(op.f('idx_tramo_ref'), 'tramos', ['empresa_id', 'referencia'], unique=False)
     op.create_table('rol_permisos',
     sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
     sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
@@ -756,6 +912,13 @@ def downgrade() -> None:
     sa.PrimaryKeyConstraint('id', name=op.f('rol_permisos_pkey'))
     )
     op.create_index(op.f('uq_rol_permiso_empresa'), 'rol_permisos', ['empresa_id', 'rol_id', 'permiso_id'], unique=True)
+    op.create_table('permisos',
+    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
+    sa.Column('codigo', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=False),
+    sa.PrimaryKeyConstraint('id', name=op.f('permisos_pkey')),
+    sa.UniqueConstraint('codigo', name=op.f('permisos_codigo_key'), postgresql_include=[], postgresql_nulls_not_distinct=False)
+    )
     op.create_table('roturas_cristales',
     sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
     sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
@@ -777,118 +940,6 @@ def downgrade() -> None:
     sa.ForeignKeyConstraint(['tramo_id'], ['tramos.id'], name=op.f('roturas_cristales_tramo_id_fkey')),
     sa.PrimaryKeyConstraint('id', name=op.f('roturas_cristales_pkey'))
     )
-    op.create_table('permisos',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('codigo', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.PrimaryKeyConstraint('id', name=op.f('permisos_pkey')),
-    sa.UniqueConstraint('codigo', name=op.f('permisos_codigo_key'), postgresql_include=[], postgresql_nulls_not_distinct=False)
-    )
-    op.create_table('tramos',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('almacen_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('nombre', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('referencia', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('fecha_compra', sa.DATE(), autoincrement=False, nullable=True),
-    sa.Column('estado', sa.TEXT(), server_default=sa.text("'ABIERTO'::text"), autoincrement=False, nullable=False),
-    sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False),
-    sa.Column('creado_por', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
-    sa.Column('actualizado_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True),
-    sa.ForeignKeyConstraint(['almacen_id'], ['almacenes.id'], name=op.f('tramos_almacen_id_fkey')),
-    sa.ForeignKeyConstraint(['creado_por'], ['usuarios.id'], name=op.f('tramos_creado_por_fkey')),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('tramos_empresa_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('tramos_pkey'))
-    )
-    op.create_index(op.f('idx_tramo_ref'), 'tramos', ['empresa_id', 'referencia'], unique=False)
-    op.create_table('tramo_items',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('tramo_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('cristal_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('cantidad_inicial', sa.INTEGER(), server_default=sa.text('0'), autoincrement=False, nullable=False),
-    sa.Column('cantidad_actual', sa.INTEGER(), server_default=sa.text('0'), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['cristal_id'], ['cristales.id'], name=op.f('tramo_items_cristal_id_fkey')),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('tramo_items_empresa_id_fkey')),
-    sa.ForeignKeyConstraint(['tramo_id'], ['tramos.id'], name=op.f('tramo_items_tramo_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('tramo_items_pkey'))
-    )
-    op.create_index(op.f('uq_tramo_item'), 'tramo_items', ['empresa_id', 'tramo_id', 'cristal_id'], unique=True)
-    op.create_table('secuencias_documentos',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('tipo', postgresql.ENUM('FACTURA', 'NOTA_CREDITO', 'REMISION', name='tipo_documento'), autoincrement=False, nullable=False),
-    sa.Column('serie', sa.TEXT(), server_default=sa.text("'A'::text"), autoincrement=False, nullable=False),
-    sa.Column('proximo_num', sa.BIGINT(), server_default=sa.text('1'), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('secuencias_documentos_empresa_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('secuencias_documentos_pkey'))
-    )
-    op.create_index(op.f('uq_seq_empresa_tipo_serie'), 'secuencias_documentos', ['empresa_id', 'tipo', 'serie'], unique=True)
-    op.create_table('usuario_perfil_laboral',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('usuario_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('tipo', postgresql.ENUM('VENDEDOR', 'INSTALADOR', 'GERENTE', 'ADMINISTRATIVO', name='tipo_usuario_labor'), autoincrement=False, nullable=False),
-    sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False),
-    sa.Column('telefono', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('nota', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('usuario_perfil_laboral_empresa_id_fkey')),
-    sa.ForeignKeyConstraint(['usuario_id'], ['usuarios.id'], name=op.f('usuario_perfil_laboral_usuario_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('usuario_perfil_laboral_pkey'))
-    )
-    op.create_index(op.f('uq_perfil_laboral_usuario_tipo'), 'usuario_perfil_laboral', ['empresa_id', 'usuario_id', 'tipo'], unique=True)
-    op.create_table('auditoria_eventos',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('actor_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('entidad', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('entidad_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('accion', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('detalle', postgresql.JSON(astext_type=sa.Text()), autoincrement=False, nullable=True),
-    sa.Column('ip', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['actor_id'], ['usuarios.id'], name=op.f('auditoria_eventos_actor_id_fkey')),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('auditoria_eventos_empresa_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('auditoria_eventos_pkey'))
-    )
-    op.create_table('factura_detalle',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('factura_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('cristal_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('tramo_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('cantidad', sa.INTEGER(), server_default=sa.text('1'), autoincrement=False, nullable=False),
-    sa.Column('precio_unit', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
-    sa.Column('descuento', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['cristal_id'], ['cristales.id'], name=op.f('factura_detalle_cristal_id_fkey')),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('factura_detalle_empresa_id_fkey')),
-    sa.ForeignKeyConstraint(['factura_id'], ['facturas.id'], name=op.f('factura_detalle_factura_id_fkey')),
-    sa.ForeignKeyConstraint(['tramo_id'], ['tramos.id'], name=op.f('factura_detalle_tramo_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('factura_detalle_pkey'))
-    )
-    op.create_table('liquidaciones',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('rol', postgresql.ENUM('VENDEDOR', 'INSTALADOR', 'GERENTE', name='rol_comision'), autoincrement=False, nullable=False),
-    sa.Column('perfil_laboral_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('periodo_desde', sa.DATE(), autoincrement=False, nullable=False),
-    sa.Column('periodo_hasta', sa.DATE(), autoincrement=False, nullable=False),
-    sa.Column('total_comision', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
-    sa.Column('estado', postgresql.ENUM('ABIERTA', 'CERRADA', 'PAGADA', name='estado_liquidacion'), server_default=sa.text("'ABIERTA'::estado_liquidacion"), autoincrement=False, nullable=False),
-    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
-    sa.Column('creado_por', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('cerrado_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True),
-    sa.Column('pagado_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True),
-    sa.Column('nota', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.ForeignKeyConstraint(['creado_por'], ['usuarios.id'], name=op.f('liquidaciones_creado_por_fkey')),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('liquidaciones_empresa_id_fkey')),
-    sa.ForeignKeyConstraint(['perfil_laboral_id'], ['usuario_perfil_laboral.id'], name=op.f('liquidaciones_perfil_laboral_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('liquidaciones_pkey'))
-    )
     op.create_table('reglas_comision',
     sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
     sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
@@ -908,91 +959,6 @@ def downgrade() -> None:
     sa.ForeignKeyConstraint(['perfil_laboral_id'], ['usuario_perfil_laboral.id'], name=op.f('reglas_comision_perfil_laboral_id_fkey')),
     sa.PrimaryKeyConstraint('id', name=op.f('reglas_comision_pkey'))
     )
-    op.create_table('orden_detalle',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('orden_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('tipo_item', postgresql.ENUM('CRISTAL', 'TRAMO', 'SERVICIO', 'ACCESORIO', name='tipo_item_orden'), autoincrement=False, nullable=False),
-    sa.Column('cristal_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('tramo_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('cantidad', sa.INTEGER(), server_default=sa.text('1'), autoincrement=False, nullable=False),
-    sa.Column('precio_unit', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
-    sa.Column('descuento', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['cristal_id'], ['cristales.id'], name=op.f('orden_detalle_cristal_id_fkey')),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('orden_detalle_empresa_id_fkey')),
-    sa.ForeignKeyConstraint(['orden_id'], ['ordenes.id'], name=op.f('orden_detalle_orden_id_fkey')),
-    sa.ForeignKeyConstraint(['tramo_id'], ['tramos.id'], name=op.f('orden_detalle_tramo_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('orden_detalle_pkey'))
-    )
-    op.create_table('compatibilidad',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('cristal_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('marca', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('modelo', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('anio_desde', sa.INTEGER(), autoincrement=False, nullable=True),
-    sa.Column('anio_hasta', sa.INTEGER(), autoincrement=False, nullable=True),
-    sa.ForeignKeyConstraint(['cristal_id'], ['cristales.id'], name=op.f('compatibilidad_cristal_id_fkey')),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('compatibilidad_empresa_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('compatibilidad_pkey'))
-    )
-    op.create_index(op.f('idx_compat_marca_modelo'), 'compatibilidad', ['empresa_id', 'marca', 'modelo'], unique=False)
-    op.create_table('cristales',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('sku', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('descripcion', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('tipo', postgresql.ENUM('STANDARD', 'TEMPLADO', 'BLINDADO', name='tipo_cristal'), autoincrement=False, nullable=False),
-    sa.Column('lado', postgresql.ENUM('IZQ', 'DER', 'AMBOS', name='lado_cristal'), autoincrement=False, nullable=True),
-    sa.Column('marca_cristal', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('costo', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
-    sa.Column('precio_base', sa.NUMERIC(precision=12, scale=2), server_default=sa.text('0'), autoincrement=False, nullable=False),
-    sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False),
-    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('cristales_empresa_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('cristales_pkey'))
-    )
-    op.create_index(op.f('uq_cristal_empresa_sku'), 'cristales', ['empresa_id', 'sku'], unique=True)
-    op.create_index(op.f('idx_cristal_tipo'), 'cristales', ['empresa_id', 'tipo'], unique=False)
-    op.create_table('liquidacion_detalle',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('liquidacion_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('comision_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['comision_id'], ['comisiones.id'], name=op.f('liquidacion_detalle_comision_id_fkey')),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('liquidacion_detalle_empresa_id_fkey')),
-    sa.ForeignKeyConstraint(['liquidacion_id'], ['liquidaciones.id'], name=op.f('liquidacion_detalle_liquidacion_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('liquidacion_detalle_pkey'))
-    )
-    op.create_table('sesiones',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('usuario_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('token_hash', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('estado', postgresql.ENUM('ACTIVA', 'REVOCADA', 'EXPIRADA', name='estado_sesion'), server_default=sa.text("'ACTIVA'::estado_sesion"), autoincrement=False, nullable=False),
-    sa.Column('ip', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('user_agent', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('creado_en', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('now()'), autoincrement=False, nullable=False),
-    sa.Column('expira_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=False),
-    sa.Column('revocado_en', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('sesiones_empresa_id_fkey')),
-    sa.ForeignKeyConstraint(['usuario_id'], ['usuarios.id'], name=op.f('sesiones_usuario_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('sesiones_pkey')),
-    sa.UniqueConstraint('token_hash', name=op.f('sesiones_token_hash_key'), postgresql_include=[], postgresql_nulls_not_distinct=False)
-    )
-    op.create_table('usuario_roles',
-    sa.Column('id', sa.UUID(), server_default=sa.text('gen_random_uuid()'), autoincrement=False, nullable=False),
-    sa.Column('empresa_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('usuario_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('rol_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('activo', sa.BOOLEAN(), server_default=sa.text('true'), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['empresa_id'], ['empresas.id'], name=op.f('usuario_roles_empresa_id_fkey')),
-    sa.ForeignKeyConstraint(['rol_id'], ['roles.id'], name=op.f('usuario_roles_rol_id_fkey')),
-    sa.ForeignKeyConstraint(['usuario_id'], ['usuarios.id'], name=op.f('usuario_roles_usuario_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('usuario_roles_pkey'))
-    )
-    op.create_index(op.f('uq_usuario_rol_empresa'), 'usuario_roles', ['empresa_id', 'usuario_id', 'rol_id'], unique=True)
     op.drop_table('catalogo')
     op.drop_table('perfiles')
     # ### end Alembic commands ###

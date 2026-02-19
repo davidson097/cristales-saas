@@ -1,39 +1,21 @@
 # Python
 __pycache__/
 *.pyc
-*.pyo
 .venv/
 venv/
-env/
-*.egg-info/
-dist/
-build/
 
-# Env
+# Entorno / secretos
 .env
-.env.local
-.env.*.local
+.env.*
 
-# Node
-node_modules/
-dist/
-.vite/
-*.tsbuildinfo
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
+# Mac
 .DS_Store
-Thumbs.db
 
 # Logs
 *.log
-logs/
 
-# Alembic
-alembic/versions/*.py
-!alembic/versions/0001_init.py
+# VS Code (ignora cualquier .vscode en cualquier carpeta)
+.vscode/
+
+# Carpetas temporales / basura
+alembic__unused/

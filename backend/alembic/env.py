@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import os
+import sys
 from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
+
+# Add backend to sys.path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # Cargar .env (repo root o backend/.env)
 try:
@@ -37,10 +41,12 @@ if config.config_file_name is not None:
 # Si falla, cambia la primera y deja el resto igual.
 try:
     from app.db.base import Base  # <- opción típica
-except Exception:
+except Exception as e:
+    print(f"Error importing Base: {e}")
     try:
         from app.database import Base  # <- opción alternativa
-    except Exception:
+    except Exception as e2:
+        print(f"Error importing Base alt: {e2}")
         # Último recurso: si tu Base vive en otro lado, ponlo aquí
         # from app.algo import Base
         Base = None
